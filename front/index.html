@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>TP Docker Note - Items</title>
+</head>
+<body>
+    <h1>Liste des Items</h1>
+
+    <select id="itemsList" size="5" style="width: 200px;"></select>
+    <button onclick="deleteItem()">Supprimer l'item sélectionné</button>
+
+    <h2>Ajouter un item</h2>
+    <input type="text" id="newItem" placeholder="Nom de l'item">
+    <button onclick="addItem()">Ajouter</button>
+
+    <script>
+        const apiUrl = 'http://localhost:5000/items';
+
+        async function fetchItems() {
+            const response = await fetch(apiUrl);
+            const items = await response.json();
+            const list = document.getElementById('itemsList');
+            list.innerHTML = '';
+            items.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = item.name;
+                list.appendChild(option);
+            });
+        }
+
+        async function addItem() {
+            const name = document.getElementById('newItem').value;
+            if (!name) return alert("Veuillez entrer un nom d'item");
+            await fetch(apiUrl, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name})
+            });
+            document.getElementById('newItem').value = '';
+            fetchItems();
+        }
+
+        async function deleteItem() {
+            const list = document.getElementById('itemsList');
+            const id = list.value;
+            if (!id) return alert("Veuillez sélectionner un item à supprimer");
+            await fetch(`${apiUrl}/${id}`, {method: 'DELETE'});
+            fetchItems();
+        }
+
+        fetchItems();
+    </script>
+</body>
+</html>

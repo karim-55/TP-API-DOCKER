@@ -1,0 +1,36 @@
+services:
+  api:
+    build: ./api
+    container_name: tp_api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: tp_postgres
+      DB_NAME: tp
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+
+  front:
+    build: ./front
+    container_name: tp_front
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: tp_postgres
+    environment:
+      POSTGRES_DB: tp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
